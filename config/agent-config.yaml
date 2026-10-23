@@ -1,0 +1,44 @@
+# ------------------------------------------------------------------
+# RV&S Test Case Generator – configuration
+# Edit this file to adapt the agent. Copilot and the scripts read it.
+# ------------------------------------------------------------------
+
+paths:
+  requirements: input/requirements          # new requirements (.docx / .xlsx)
+  existing_testcases: input/existing_testcases  # reference test cases (.docx / .xlsx)
+  templates: input/templates               # optional: rvs_template.docx with your company styles
+  output: output                           # each run creates output/<YYYY-MM-DD_HHMM>_<name>/
+  work: output/_work                       # extracted text from inputs (temporary, git-ignored)
+
+examples:
+  # Add anonymized sample requirements / test cases under examples/ to teach the
+  # agent your house style. Used as additional references on every run.
+  use_examples: true
+  requirements: examples/requirements
+  existing_testcases: examples/existing_testcases
+
+generation:
+  language: English
+  test_types: [positive, negative, edge]   # edge only where it makes sense
+  value_technique: equivalence_classes     # for value ranges: one TC per class, boundaries as edge cases
+  reuse_existing: true                     # REUSED / ADAPTED / NEW classification
+  max_steps_per_testcase: 15
+  min_steps_per_testcase: 2
+  placeholder_for_missing_values: "[TBD]"  # never invent numbers, signals or timings
+  automation_hints: false                  # later: add signal names / tolerances for vTestStudio/CANoe
+
+rvs_word_import:
+  # Matches the RV&S Word importer: one heading per test case,
+  # step table directly below it. Preconditions are entered manually in RV&S.
+  group_heading_level: 1                   # feature / requirement group heading (→ RV&S "Heading")
+  testcase_heading_level: 2                # one heading per test case (→ RV&S "Test Case")
+  group_by: requirement_file               # requirement_file | none
+  step_table_columns: ["#", "Actions", "Expected Results"]
+  table_style: "Table Grid"
+  header_shading_hex: "D9D9D9"
+  include_reused_in_docx: false            # REUSED test cases are linked in RV&S, not re-imported
+
+companion_sheet:
+  # Excel list for the fields entered manually after import
+  # (ShortDescription, Preconditions) plus origin / source TC ID.
+  enabled: true

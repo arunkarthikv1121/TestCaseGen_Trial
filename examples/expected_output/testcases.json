@@ -1,0 +1,93 @@
+{
+  "name": "GensetControl_Example",
+  "generated_from": ["examples/requirements/EXAMPLE_REQ_Genset_Control.docx"],
+  "test_cases": [
+    {
+      "group": "System Availability after Power Cycle",
+      "title": "Genset System Availability after Power Cycle",
+      "short_description": "Operational system after boot up",
+      "type": "positive",
+      "origin": "REUSED",
+      "source_tc": "Genset System Availability after Power Cycle",
+      "requirement_refs": ["1 System Availability after Power Cycle"],
+      "preconditions": ["Plant ready for operations.", "No alarms.", "Engine is not running."],
+      "steps": []
+    },
+    {
+      "group": "System Availability after Power Cycle",
+      "title": "Start-Up Failure Alarm When Operational State Not Reached",
+      "short_description": "Alarm A010 if start-up exceeds 60 s",
+      "type": "negative",
+      "origin": "ADAPTED",
+      "source_tc": "Genset System Availability after Power Cycle",
+      "requirement_refs": ["1 System Availability after Power Cycle"],
+      "preconditions": ["Plant ready for operations.", "No alarms.", "Engine is not running.", "Means to delay control system start-up available (e.g. disconnected I/O module)."],
+      "steps": [
+        {"action": "Prevent the control system from reaching operational state ([TBD] method).", "expected": "Start-up delay condition is active."},
+        {"action": "Switch off the 24 V control supply.", "expected": "HMI and control system are switched off."},
+        {"action": "Wait 10 s and switch on the 24 V control supply.", "expected": "Control system starts. HMI shows 'Starting'."},
+        {"action": "Wait 60 s after switching on the 24 V control supply.", "expected": "Alarm A010 'Control system start-up failed' is displayed. HMI does not show 'System ready'."}
+      ],
+      "open_points": ["Requirement does not define how a start-up failure can be provoked in the test setup."]
+    },
+    {
+      "group": "Battery Voltage Monitoring",
+      "title": "No Battery Warning in Normal Voltage Range",
+      "short_description": "No warning at 22.0–28.8 V",
+      "type": "positive",
+      "origin": "NEW",
+      "requirement_refs": ["2 Battery Voltage Monitoring"],
+      "preconditions": ["Plant ready for operations.", "No alarms.", "Starter battery replaced by adjustable power supply."],
+      "steps": [
+        {"action": "Set the battery supply voltage to 25.4 V (normal class 22.0–28.8 V).", "expected": "No battery warning is displayed."},
+        {"action": "Check the alarm list.", "expected": "Neither W021 nor W022 is active."}
+      ]
+    },
+    {
+      "group": "Battery Voltage Monitoring",
+      "title": "Low Battery Voltage Warning and Automatic Reset",
+      "short_description": "W021 below 22.0 V, cleared after 5 s normal",
+      "type": "negative",
+      "origin": "NEW",
+      "requirement_refs": ["2 Battery Voltage Monitoring"],
+      "preconditions": ["Plant ready for operations.", "No alarms.", "Starter battery replaced by adjustable power supply."],
+      "steps": [
+        {"action": "Set the battery supply voltage to 25.4 V.", "expected": "No battery warning is displayed."},
+        {"action": "Reduce the battery supply voltage to 20.0 V (low class < 22.0 V).", "expected": "Warning W021 'Low battery voltage' is displayed."},
+        {"action": "Increase the battery supply voltage to 25.4 V and wait 5 s.", "expected": "Warning W021 is cleared automatically."}
+      ]
+    },
+    {
+      "group": "Battery Voltage Monitoring",
+      "title": "High Battery Voltage Warning and Automatic Reset",
+      "short_description": "W022 above 28.8 V, cleared after 5 s normal",
+      "type": "negative",
+      "origin": "NEW",
+      "requirement_refs": ["2 Battery Voltage Monitoring"],
+      "preconditions": ["Plant ready for operations.", "No alarms.", "Starter battery replaced by adjustable power supply."],
+      "steps": [
+        {"action": "Set the battery supply voltage to 25.4 V.", "expected": "No battery warning is displayed."},
+        {"action": "Increase the battery supply voltage to 30.0 V (high class > 28.8 V).", "expected": "Warning W022 'High battery voltage' is displayed."},
+        {"action": "Reduce the battery supply voltage to 25.4 V and wait 5 s.", "expected": "Warning W022 is cleared automatically."}
+      ]
+    },
+    {
+      "group": "Battery Voltage Monitoring",
+      "title": "Battery Voltage Warning Thresholds at Range Boundaries",
+      "short_description": "Warning behaviour at 22.0 V and 28.8 V",
+      "type": "edge",
+      "origin": "NEW",
+      "requirement_refs": ["2 Battery Voltage Monitoring"],
+      "preconditions": ["Plant ready for operations.", "No alarms.", "Starter battery replaced by adjustable power supply with [TBD] V resolution."],
+      "steps": [
+        {"action": "Set the battery supply voltage to 22.0 V.", "expected": "No battery warning is displayed."},
+        {"action": "Reduce the battery supply voltage to 22.0 V minus [TBD] V.", "expected": "Warning W021 'Low battery voltage' is displayed."},
+        {"action": "Set the battery supply voltage to 28.8 V and wait 5 s.", "expected": "No battery warning is displayed."},
+        {"action": "Increase the battery supply voltage to 28.8 V plus [TBD] V.", "expected": "Warning W022 'High battery voltage' is displayed."},
+        {"action": "Set the battery supply voltage to 25.4 V and wait 4 s.", "expected": "Warning W022 is still displayed."},
+        {"action": "Wait a further 1 s.", "expected": "Warning W022 is cleared automatically."}
+      ],
+      "open_points": ["Measurement resolution / tolerance of the voltage thresholds is not specified."]
+    }
+  ]
+}
